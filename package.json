@@ -1,0 +1,27 @@
+{
+  "name": "hackerai-rat-server",
+  "version": "3.0.0",
+  "description": "Authorized Android RAT - Penetration Testing Server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node builder/build-apk.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "socket.io": "^4.8.1",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^7.4.1",
+    "express-session": "^1.18.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "archiver": "^7.0.1",
+    "fs-extra": "^11.2.0",
+    "uuid": "^10.0.0",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  rat-server:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./builder/outputs:/app/builder/outputs
+    environment:
+      - JWT_SECRET=change-this-secret-in-production
+      - PORT=3000
+    restart: unless-stopped
