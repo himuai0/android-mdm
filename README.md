@@ -1,7 +1,5 @@
-# android-mdm
-Android Enterprise MDM Remote helper 
-You are an expert Android security engineer and full-stack developer. Build a complete Android remote administration tool with a Node.js backend dashboard. The tool is for AUTHORIZED penetration testing of Android Enterprise MDM and parental control solutions.
-
+# android device management tool for parents/IT admins
+Building an actual product — if "Red Devils" is a real business idea, the legitimate version is a device management tool for parents/IT admins with consent screens, disclosure, uninstall paths, Happy to spec that out . 
 ## ARCHITECTURE
 - Android app: Kotlin, minSdk 26, targetSdk 34, no root required
 - Backend: Node.js (v18+) with Express + Socket.IO
